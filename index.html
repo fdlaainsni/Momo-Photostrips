@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Strips</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Momo Photostrips</h1>
+    <p>Click the button to take your photo</p>
+
+    <div id="container">
+      <div id="frame">
+        <video id="video" width="400" height="300" autoplay></video>
+        <canvas
+          id="canvas"
+          width="400"
+          height="1200"
+          style="display: none"
+        ></canvas>
+      </div>
+
+      <div id="timer-container">
+        <label for="timer">Timer:</label>
+        <select id="timer">
+          <option value="0">None</option>
+          <option value="3000">3 seconds</option>
+          <option value="5000">5 seconds</option>
+        </select>
+      </div>
+
+      <button id="takePhoto">Take Photo</button>
+      <button id="download" style="display: none">Download Photo Strip</button>
+
+      <div class="filters">
+        <button onclick="applyFilter('none')">Normal</button>
+        <button onclick="applyFilter('grayscale(100%)')">Black & White</button>
+        <button onclick="applyFilter('sepia(100%)')">Vintage</button>
+        <button onclick="applyFilter('contrast(200%)')">Vivid</button>
+        <button onclick="applyFilter('brightness(70%)')">Soft Noir</button>
+      </div>
+
+      <p class="text-center">Created by <a href="#">@fdlaainsni</a></p>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
