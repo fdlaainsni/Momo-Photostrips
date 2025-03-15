@@ -2,7 +2,7 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 const takePhoto = document.getElementById("takePhoto");
-const download = document.getElementById("download"); // ✅ Perbaikan variabel download
+const download = document.getElementById("download"); //  Perbaikan variabel download
 const timerSelect = document.getElementById("timer");
 
 let filter = "none";
@@ -67,7 +67,7 @@ function generatePhotoStrip() {
 
   setTimeout(() => {
     canvas.style.display = "block";
-    download.style.display = "block"; // ✅ Memastikan tombol download muncul setelah strip dibuat
+    download.style.display = "block"; //  Memastikan tombol download muncul setelah strip dibuat
   }, 500);
 
   photoIndex = 0;
@@ -76,7 +76,7 @@ function generatePhotoStrip() {
 
 // FUNGSI DOWNLOAD FOTO
 download.addEventListener("click", () => {
-  const image = canvas.toDataURL("image/png"); // Konversi ke PNG
+  const image = canvas.toDataURL("image/png", 1.0); // Konversi ke PNG
   const link = document.createElement("a");
   link.href = image;
   link.download = "photo_strip.png";
