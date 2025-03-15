@@ -34,13 +34,12 @@ takePhoto.addEventListener("click", () => {
   }
 });
 
-// Menangkap Foto dan Menyesuaikan Ukuran
+// Menangkap Foto dengan Ukuran Video Asli
 function capturePhoto() {
   if (photoIndex < 4) {
     const tempCanvas = document.createElement("canvas");
-    const aspectRatio = 4 / 3; // Rasio tetap agar tidak gepeng
-    const width = 400;
-    const height = width / aspectRatio;
+    const width = video.videoWidth; // Gunakan ukuran asli video
+    const height = video.videoHeight;
 
     tempCanvas.width = width;
     tempCanvas.height = height;
