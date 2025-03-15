@@ -5,87 +5,33 @@ body {
 }
 
 /* Mobile */
-@media screen and (max-width: 1025px) {
-  body {
-    font-size: 14px;
-  }
-  .header {
-    font-size: 18px;
-  }
-  #container {
-    width: 90%;
-    padding: 10px;
-  }
+@media screen and (max-width: 600px) {
   video,
   canvas {
     width: 100%;
     height: auto;
     aspect-ratio: 4 / 3; /* Pastikan aspek rasio tetap 4:3 */
   }
-  button {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-  #stickers {
-    display: none; /* Sembunyikan stiker di mobile */
-  }
 }
 
 /* Tablet */
 @media screen and (min-width: 601px) and (max-width: 1024px) {
-  body {
-    font-size: 16px;
-  }
-  .header {
-    font-size: 22px;
-  }
-  #container {
-    width: 80%;
-    padding: 15px;
-  }
   video,
   canvas {
     width: 80%;
     height: auto;
-  }
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-  }
-  #stickers {
-    display: block; /* Tampilkan stiker di tablet */
+    aspect-ratio: 4 / 3;
   }
 }
 
 /* Desktop */
 @media screen and (min-width: 1025px) {
-  body {
-    font-size: 18px;
-  }
-  .header {
-    font-size: 26px;
-  }
-  #container {
-    width: 70%;
-    padding: 20px;
-  }
   video,
   canvas {
     width: 60%;
     height: auto;
+    aspect-ratio: 4 / 3;
   }
-  button {
-    padding: 12px 24px;
-    font-size: 18px;
-  }
-  #stickers {
-    display: block; /* Tampilkan stiker di desktop */
-  }
-}
-
-h1 {
-  color: #333;
-  margin: 20px;
 }
 
 /* CONTAINER UTAMA */
