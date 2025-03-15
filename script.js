@@ -34,16 +34,20 @@ takePhoto.addEventListener("click", () => {
   }
 });
 
-// MENANGKAP FOTO DAN MENAMBAHKAN STICKER
+// Menangkap Foto dan Menyesuaikan Ukuran
 function capturePhoto() {
   if (photoIndex < 4) {
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = 400;
-    tempCanvas.height = 300;
+    const aspectRatio = 4 / 3; // Rasio tetap agar tidak gepeng
+    const width = 400;
+    const height = width / aspectRatio;
+
+    tempCanvas.width = width;
+    tempCanvas.height = height;
     const tempContext = tempCanvas.getContext("2d");
 
     tempContext.filter = filter;
-    tempContext.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+    tempContext.drawImage(video, 0, 0, width, height);
 
     photos.push(tempCanvas.toDataURL("image/png"));
     photoIndex++;
