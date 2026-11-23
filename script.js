@@ -2,20 +2,37 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 const takePhoto = document.getElementById("takePhoto");
-const download = document.getElementById("download"); // ✅ Perbaikan variabel download
+const download = document.getElementById("download");
 const timerSelect = document.getElementById("timer");
+
+const MAX_PHOTOS = 4;
+const PHOTO_WIDTH = 400;
+const PHOTO_HEIGHT = 300;
 
 let filter = "none";
 let photos = [];
 let photoIndex = 0;
+let isCapturing = false;
 
 // AKSES KAMERA
-navigator.mediaDevices
-  .getUserMedia({ video: { facingMode: "user" } })
-  .then((stream) => {
+async function initCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+      },
+      audio: false,
+    });
     video.srcObject = stream;
-  })
-  .catch((err) => console.error(err));
+  } catch (err) {
+    console.error("Gagal mengakses kamera:", err);
+    alert("Kamera tidak dapat diakses. Pastikan izin kamera sudah aktif.");
+  }
+}
+
+initCamera();
 
 // MENAMBAHKAN FILTER
 function applyFilter(filterType) {
@@ -23,60 +40,103 @@ function applyFilter(filterType) {
   video.style.filter = filter;
 }
 
-// MENGAMBIL FOTO
+// MENGAMBIL FOTO DENGAN TIMER OPSIONAL
 takePhoto.addEventListener("click", () => {
-  const delay = parseInt(timerSelect.value);
+  if (isCapturing || photoIndex >= MAX_PHOTOS) return;
+
+  const delay = parseInt(timerSelect.value, 10) || 0;
+  isCapturing = true;
+  takePhoto.disabled = true;
 
   if (delay > 0) {
-    setTimeout(capturePhoto, delay);
+    setTimeout(() => {
+      capturePhoto();
+      isCapturing = false;
+      if (photoIndex < MAX_PHOTOS) {
+        takePhoto.disabled = false;
+      }
+    }, delay);
   } else {
     capturePhoto();
+    isCapturing = false;
+    if (photoIndex < MAX_PHOTOS) {
+      takePhoto.disabled = false;
+    }
   }
 });
 
-// MENANGKAP FOTO DAN MENAMBAHKAN STICKER
+// MENANGKAP SATU FOTO
 function capturePhoto() {
-  if (photoIndex < 4) {
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = 400;
-    tempCanvas.height = 300;
-    const tempContext = tempCanvas.getContext("2d");
+  if (photoIndex >= MAX_PHOTOS || !video.videoWidth) return;
 
-    tempContext.filter = filter;
-    tempContext.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = PHOTO_WIDTH;
+  tempCanvas.height = PHOTO_HEIGHT;
+  const tempContext = tempCanvas.getContext("2d");
 
-    photos.push(tempCanvas.toDataURL("image/png"));
-    photoIndex++;
+  tempContext.save();
+  tempContext.filter = filter;
 
-    if (photoIndex === 4) {
-      generatePhotoStrip();
-    }
+  // Balik horizontal agar hasil foto sesuai tampilan mirror kamera depan
+  tempContext.translate(tempCanvas.width, 0);
+  tempContext.scale(-1, 1);
+  tempContext.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+
+  tempContext.restore();
+
+  photos.push(tempCanvas.toDataURL("image/png"));
+  photoIndex++;
+  takePhoto.textContent = `Take Photo (${photoIndex}/${MAX_PHOTOS})`;
+
+  if (photoIndex === MAX_PHOTOS) {
+    generatePhotoStrip();
   }
 }
 
-// TAMPILAN STRIP FOTO
-function generatePhotoStrip() {
+// MENYUSUN 4 FOTO MENJADI PHOTO STRIP
+async function generatePhotoStrip() {
+  canvas.width = PHOTO_WIDTH;
+  canvas.height = PHOTO_HEIGHT * MAX_PHOTOS;
   context.clearRect(0, 0, canvas.width, canvas.height);
-  photos.forEach((photo, index) => {
-    let img = new Image();
-    img.src = photo;
-    img.onload = () => {
-      context.drawImage(img, 0, index * 300, 400, 300);
-    };
-  });
 
-  setTimeout(() => {
+  const loadImage = (src) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  try {
+    const loadedImages = await Promise.all(photos.map(loadImage));
+
+    loadedImages.forEach((img, index) => {
+      context.drawImage(
+        img,
+        0,
+        index * PHOTO_HEIGHT,
+        PHOTO_WIDTH,
+        PHOTO_HEIGHT
+      );
+    });
+
     canvas.style.display = "block";
-    download.style.display = "block"; // ✅ Memastikan tombol download muncul setelah strip dibuat
-  }, 500);
-
-  photoIndex = 0;
-  photos = [];
+    download.style.display = "inline-block";
+  } catch (err) {
+    console.error("Gagal menyusun photo strip:", err);
+  } finally {
+    // Reset state untuk sesi foto berikutnya
+    photoIndex = 0;
+    photos = [];
+    isCapturing = false;
+    takePhoto.disabled = false;
+    takePhoto.textContent = "Take Photo";
+  }
 }
 
-// FUNGSI DOWNLOAD FOTO
+// DOWNLOAD FOTO STRIP
 download.addEventListener("click", () => {
-  const image = canvas.toDataURL("image/png"); // Konversi ke PNG
+  const image = canvas.toDataURL("image/png");
   const link = document.createElement("a");
   link.href = image;
   link.download = "photo_strip.png";
